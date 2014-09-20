@@ -20,5 +20,6 @@
     "content_scripts": [{
         "js": ["contentscript.js"],
         "matches": ["https://soundcloud.com/*", "http://soundcloud.com/*"]
-    }]
+    }],
+    "web_accessible_resources": ["script.js"]
 }
