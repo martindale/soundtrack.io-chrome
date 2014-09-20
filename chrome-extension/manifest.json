@@ -5,9 +5,9 @@
     "description": "music for all.",
     "homepage_url": "https://soundtrack.io",
     "icons": {
-        "16": "img/icon16.png",
-        "48": "img/icon48.png",
-        "128": "img/icon128.png"
+        "16": "img/soundtrack.ico",
+        "48": "img/soundtrack.ico",
+        "128": "img/soundtrack.ico"
     },
     "permissions": [
       "tabs",
@@ -19,6 +19,6 @@
     },
     "content_scripts": [{
         "js": ["contentscript.js"],
-        "matches": ["https://soundcloud.com/*", "http://soundcloud.com*"]
+        "matches": ["https://soundcloud.com/*", "http://soundcloud.com/*"]
     }]
 }
