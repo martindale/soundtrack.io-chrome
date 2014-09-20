@@ -20,7 +20,7 @@ var loader = setInterval(function() {
 }, 250 );
 
 function addButtons() {
-  $('.sc-button-share.sc-button.sc-button-responsive:not(.soundtracked)').each(function(i) {
+  $('.sc-button-share.sc-button.sc-button-small.sc-button-responsive:not(.soundtracked)').each(function(i) {
     var self = this;
     
     // mark it as being tracked
