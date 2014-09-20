@@ -1,0 +1,24 @@
+{
+    "name": "soundtrack.io",
+    "version": "0.0.0",
+    "manifest_version": 2,
+    "description": "music for all.",
+    "homepage_url": "https://soundtrack.io",
+    "icons": {
+        "16": "img/icon16.png",
+        "48": "img/icon48.png",
+        "128": "img/icon128.png"
+    },
+    "permissions": [
+      "tabs",
+      "notifications"
+    ],
+    "background": {
+        "page": "background.html",
+        "persistent": true
+    },
+    "content_scripts": [{
+        "js": ["contentscript.js"],
+        "matches": ["https://soundcloud.com/*", "http://soundcloud.com*"]
+    }]
+}
