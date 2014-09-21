@@ -17,6 +17,15 @@ var loader = setInterval(function() {
   
   soundtrack = document.getElementById('soundtrack').contentWindow;
   
+  $.urlParam = function(name) {
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (results == null) {
+       return null;
+    } else {
+       return results[1] || 0;
+    }
+  }
+  
 }, 250 );
 
 function queue( source , id ) {
@@ -30,6 +39,34 @@ function queue( source , id ) {
 }
 
 function addButtons() {
+  
+  $('.yt-uix-menu:not(.soundtracked)').each(function(i) {
+    var self = this;
+    
+    // mark it as being tracked
+    $( this ).addClass('soundtracked');
+    
+    var track = {
+      id: $.urlParam('v')
+    }
+    
+    $('<span><button class="yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon action-panel-trigger yt-uix-button-opacity yt-uix-tooltip">&#9835; Queue &raquo;</button></span>')
+      .on('click', function(e) {
+        e.preventDefault();
+        
+        $(this).slideUp(function() {
+          $(this).remove();
+        });
+        
+        queue( 'youtube', track.id );
+        
+        return false;
+      })
+      .hide()
+      .fadeIn()
+      .insertBefore( self );
+    
+  });
   
   // is this a single sound's page?
   if ( $('meta[property="og:type"][content="soundcloud:sound"]').length || $('.listenHero').length ) {

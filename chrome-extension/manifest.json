@@ -19,7 +19,12 @@
     },
     "content_scripts": [{
         "js": ["contentscript.js"],
-        "matches": ["https://soundcloud.com/*", "http://soundcloud.com/*"]
+        "matches": [
+          "https://soundcloud.com/*",
+          "http://soundcloud.com/*",
+          "https://*.youtube.com/*",
+          "http://*.youtube.com/*"
+        ]
     }],
-    "web_accessible_resources": ["script.js"]
+    "web_accessible_resources": ["script.js", "jquery-2.1.1.min.js"]
 }
