@@ -19,7 +19,47 @@ var loader = setInterval(function() {
   
 }, 250 );
 
+function queue( source , id ) {
+  soundtrack.postMessage( JSON.stringify({
+    method: 'queue',
+    data: {
+      source: source,
+      id: id
+    }
+  } ), '*'); // TODO: not use *?
+}
+
 function addButtons() {
+  
+  // is this a single sound's page?
+  if ( $('meta[property="og:type"][content="soundcloud:sound"]').length || $('.listenHero').length ) {
+    $('.sc-button-share.sc-button.sc-button-medium.sc-button-responsive:not(.soundtracked)').each(function(i) {
+      var self = this;
+      
+      // mark it as being tracked
+      $( this ).addClass('soundtracked');
+
+      $.get('resolve.json', { url: window.location.href }, function( track ) {
+        $('<button class="sc-button sc-button-medium sc-button-responsive" title="Queue on soundtrack.io">&#9835; Queue &raquo;</button>')
+          .on('click', function(e) {
+            e.preventDefault();
+            
+            $(this).slideUp(function() {
+              $(this).remove();
+            });
+            
+            queue( 'soundcloud', track.id );
+            
+            return false;
+          })
+          .hide()
+          .fadeIn()
+          .insertAfter( self );
+      });
+      
+    });
+  }
+  
   $('.sc-button-share.sc-button.sc-button-small.sc-button-responsive:not(.soundtracked)').each(function(i) {
     var self = this;
     
@@ -39,13 +79,7 @@ function addButtons() {
             $(this).remove();
           });
           
-          soundtrack.postMessage( JSON.stringify({
-            method: 'queue',
-            data: {
-              source: 'soundcloud',
-              id: track.id
-            }
-          } ), '*'); // TODO: not use *?
+          queue( 'soundcloud', track.id );
           
           return false;
         })
