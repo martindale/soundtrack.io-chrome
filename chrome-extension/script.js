@@ -76,8 +76,12 @@ function addButtons() {
       // mark it as being tracked
       $( this ).addClass('soundtracked');
 
-      $.get('resolve.json', { url: window.location.href }, function( track ) {
-        $('<button class="sc-button sc-button-medium sc-button-responsive" title="Queue on soundtrack.io">&#9835; Queue &raquo;</button>')
+      $.ajax({
+        url: 'resolve.json', 
+        data: { url: window.location.href }, 
+        dataType: "jsonp",
+        success: function( track ) {
+          $('<button class="sc-button sc-button-medium sc-button-responsive" title="Queue on soundtrack.io">&#9835; Queue &raquo;</button>')
           .on('click', function(e) {
             e.preventDefault();
             
@@ -92,8 +96,8 @@ function addButtons() {
           .hide()
           .fadeIn()
           .insertAfter( self );
+        }
       });
-      
     });
   }
   
@@ -104,11 +108,15 @@ function addButtons() {
     $( this ).addClass('soundtracked');
     
     // probably an easier way to do this
-    var path = $( this ).parent().parent().parent().parent().parent().children('a').attr('href');
+    var path = $(this).closest('.soundList__item').find('a.soundTitle__title').attr('href');
     if (!path) return;
 
-    $.get('resolve.json', { url: 'https://soundcloud.com' + path }, function( track ) {
-      $('<button class="sc-button sc-button-small sc-button-responsive" title="Queue on soundtrack.io">&#9835; Queue &raquo;</button>')
+    $.ajax({
+      url:'resolve.json',
+      data: { url: 'https://soundcloud.com' + path},
+      dataType: "jsonp",
+      success: function (track) {
+        $('<button class="sc-button sc-button-small sc-button-responsive" title="Queue on soundtrack.io">&#9835; Queue &raquo;</button>')
         .on('click', function(e) {
           e.preventDefault();
           
@@ -123,6 +131,7 @@ function addButtons() {
         .hide()
         .fadeIn()
         .insertAfter( self );
+      }
     });
   });
 }
