@@ -40,6 +40,7 @@ function queue( source , id ) {
 
 function addButtons() {
   
+  // add button to a single track's youtube page (doesn't seem to work from YT search)
   $('.yt-uix-menu:not(.soundtracked)').each(function(i) {
     var self = this;
     
@@ -50,21 +51,7 @@ function addButtons() {
       id: $.urlParam('v')
     }
     
-    $('<span><button class="yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon action-panel-trigger yt-uix-button-opacity yt-uix-tooltip">&#9835; Queue &raquo;</button></span>')
-      .on('click', function(e) {
-        e.preventDefault();
-        
-        $(this).slideUp(function() {
-          $(this).remove();
-        });
-        
-        queue( 'youtube', track.id );
-        
-        return false;
-      })
-      .hide()
-      .fadeIn()
-      .insertBefore( self );
+    drawButton('youtube', self, track.id);
     
   });
   
@@ -76,53 +63,87 @@ function addButtons() {
       // mark it as being tracked
       $( this ).addClass('soundtracked');
 
-      $.get('resolve.json', { url: window.location.href }, function( track ) {
-        $('<button class="sc-button sc-button-medium sc-button-responsive" title="Queue on soundtrack.io">&#9835; Queue &raquo;</button>')
-          .on('click', function(e) {
-            e.preventDefault();
-            
-            $(this).slideUp(function() {
-              $(this).remove();
-            });
-            
-            queue( 'soundcloud', track.id );
-            
-            return false;
-          })
-          .hide()
-          .fadeIn()
-          .insertAfter( self );
+      $.ajax({
+        url: 'resolve.json', 
+        data: { url: window.location.href }, 
+        dataType: "jsonp",
+        success: function( track ) {
+          drawButton('soundcloud', self, track.id);
+        }
       });
-      
     });
   }
   
+  // this works for the following SC lists: stream page(home), artist page, likes page, search page
+  // works functionally but icon needs help on profile pages
   $('.sc-button-share.sc-button.sc-button-small.sc-button-responsive:not(.soundtracked)').each(function(i) {
     var self = this;
     
     // mark it as being tracked
     $( this ).addClass('soundtracked');
     
-    // probably an easier way to do this
-    var path = $( this ).parent().parent().parent().parent().parent().children('a').attr('href');
+    // find the main list item for this sound and grab the title link
+    var path = $(this).closest('.soundList__item, .searchList__item').find('a.soundTitle__title').attr('href');
     if (!path) return;
 
-    $.get('resolve.json', { url: 'https://soundcloud.com' + path }, function( track ) {
-      $('<button class="sc-button sc-button-small sc-button-responsive" title="Queue on soundtrack.io">&#9835; Queue &raquo;</button>')
-        .on('click', function(e) {
-          e.preventDefault();
-          
-          $(this).slideUp(function() {
-            $(this).remove();
-          });
-          
-          queue( 'soundcloud', track.id );
-          
-          return false;
-        })
-        .hide()
-        .fadeIn()
-        .insertAfter( self );
+    var smallButton = false;
+    // see if this is a user stream (needs a 'small' button)
+    if ($('.userStream').length) {
+      smallButton = true;
+    }
+    $.ajax({
+      url:'resolve.json',
+      data: { url: 'https://soundcloud.com' + path},
+      dataType: "jsonp",
+      success: function (track) {
+        drawButton('soundcloud', self, track.id, smallButton);
+      }
     });
   });
+}
+
+// based on source (soundcloud or youtube), draws inserts queue button after ele
+function drawButton(source, ele, trackId, smallButton) {
+  var buttonClass;
+  var spanWrap = false;
+  if (typeof smallButton === 'undefined') {
+    smallButton = false;
+  }
+
+  // depending on source we need to add a handful of classes to the button
+  if (source == 'soundcloud') {
+    buttonClass = 'sc-button sc-button-small sc-button-responsive';
+  } else if (source == 'youtube') {
+    buttonClass = 'yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon action-panel-trigger yt-uix-button-opacity yt-uix-tooltip';
+    spanWrap = true;
+  }
+
+  // for SC profile views, we need som extra love on the button - skip the text and add css: text-indent: 0
+  var buttonText = '&#9835; Queue &raquo;';
+  var buttonStyle = '';
+  if (smallButton) {
+    buttonText = '&#9835';
+    buttonStyle = 'style="text-indent:0;"';
+  }
+
+  var buttonHtml = '<button class="' + buttonClass + '" title="Queue on soundtrack.io" ' + buttonStyle + '>' + buttonText + '</button>';
+  if (spanWrap) {
+    buttonHtml = '<span>' + buttonHtml + '</span>';
+  }
+
+  $(buttonHtml)
+    .on('click', function(e) {
+      e.preventDefault();
+      
+      $(this).slideUp(function() {
+        $(this).remove();
+      });
+      
+      queue( source, trackId );
+      
+      return false;
+    })
+    .hide()
+    .fadeIn()
+    .insertAfter( ele );
 }
