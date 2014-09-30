@@ -68,7 +68,7 @@ function addButtons() {
         data: { url: window.location.href }, 
         dataType: "jsonp",
         success: function( track ) {
-          drawButton('soundcloud', self, track.id);
+          drawButton('soundcloud', self, track.id, 'sc-button-medium');
         }
       });
     });
@@ -86,33 +86,25 @@ function addButtons() {
     var path = $(this).closest('.soundList__item, .searchList__item').find('a.soundTitle__title').attr('href');
     if (!path) return;
 
-    var smallButton = false;
-    // see if this is a user stream (needs a 'small' button)
-    if ($('.userStream').length) {
-      smallButton = true;
-    }
     $.ajax({
       url:'resolve.json',
       data: { url: 'https://soundcloud.com' + path},
       dataType: "jsonp",
       success: function (track) {
-        drawButton('soundcloud', self, track.id, smallButton);
+        drawButton('soundcloud', self, track.id, 'sc-button-small');
       }
     });
   });
 }
 
 // based on source (soundcloud or youtube), draws inserts queue button after ele
-function drawButton(source, ele, trackId, smallButton) {
+function drawButton(source, ele, trackId, classes ) {
   var buttonClass;
   var spanWrap = false;
-  if (typeof smallButton === 'undefined') {
-    smallButton = false;
-  }
 
   // depending on source we need to add a handful of classes to the button
   if (source == 'soundcloud') {
-    buttonClass = 'sc-button sc-button-small sc-button-responsive';
+    buttonClass = 'sc-button sc-button-responsive';
   } else if (source == 'youtube') {
     buttonClass = 'yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon action-panel-trigger yt-uix-button-opacity yt-uix-tooltip';
     spanWrap = true;
@@ -121,10 +113,8 @@ function drawButton(source, ele, trackId, smallButton) {
   // for SC profile views, we need som extra love on the button - skip the text and add css: text-indent: 0
   var buttonText = '&#9835; Queue &raquo;';
   var buttonStyle = '';
-  if (smallButton) {
-    buttonText = '&#9835';
-    buttonStyle = 'style="text-indent:0;"';
-  }
+
+  if (classes) buttonClass += ' ' + classes;
 
   var buttonHtml = '<button class="' + buttonClass + '" title="Queue on soundtrack.io" ' + buttonStyle + '>' + buttonText + '</button>';
   if (spanWrap) {
