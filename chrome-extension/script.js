@@ -56,23 +56,21 @@ function addButtons() {
   });
   
   // is this a single sound's page?
-  if ( $('meta[property="og:type"][content="soundcloud:sound"]').length || $('.listenHero').length ) {
-    $('.sc-button-share.sc-button.sc-button-medium.sc-button-responsive:not(.soundtracked)').each(function(i) {
-      var self = this;
-      
-      // mark it as being tracked
-      $( this ).addClass('soundtracked');
+  $('.sc-button-share.sc-button.sc-button-medium.sc-button-responsive:not(.soundtracked)').each(function(i) {
+    var self = this;
+    
+    // mark it as being tracked
+    $( this ).addClass('soundtracked');
 
-      $.ajax({
-        url: 'resolve.json', 
-        data: { url: window.location.href }, 
-        dataType: "jsonp",
-        success: function( track ) {
-          drawButton('soundcloud', self, track.id, 'sc-button-medium');
-        }
-      });
+    $.ajax({
+      url: 'resolve.json', 
+      data: { url: window.location.href }, 
+      dataType: "jsonp",
+      success: function( track ) {
+        drawButton('soundcloud', self, track.id, 'sc-button-medium');
+      }
     });
-  }
+  });
   
   // this works for the following SC lists: stream page(home), artist page, likes page, search page
   // works functionally but icon needs help on profile pages
@@ -115,8 +113,11 @@ function drawButton(source, ele, trackId, classes ) {
   var buttonStyle = '';
 
   if (classes) buttonClass += ' ' + classes;
+  buttonClass = 'soundtrack-button-queue ' + buttonClass;
 
   var buttonHtml = '<button class="' + buttonClass + '" title="Queue on soundtrack.io" ' + buttonStyle + '>' + buttonText + '</button>';
+  
+  // spanwrap is required for some sites (youtube)
   if (spanWrap) {
     buttonHtml = '<span>' + buttonHtml + '</span>';
   }
