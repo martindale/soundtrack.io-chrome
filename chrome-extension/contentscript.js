@@ -14,4 +14,14 @@ if (document.domain != 'soundcloud.com') {
   (document.head||document.documentElement).appendChild(j);
 }
 
+/*if (document.domain == 'soundcloud.com') {
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = chrome.runtime.getURL('style.css');
+  
+  console.log( link.href );
+  
+  document.head.appendChild( link );
+}*/
+
 console.log('soundtrack.io loaded');

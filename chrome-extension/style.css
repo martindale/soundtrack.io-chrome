@@ -1,0 +1,18 @@
+.soundtrack-button-queue.sc-button-responsive:before {
+  content: "";
+  display: block;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: center center;
+  width: 20px;
+  height: 20px;
+  top: 0;
+  left: 4px;
+  
+  background-size: 16px 16px;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gkeBTgP2N32owAAANNJREFUOMu908FKQlEQBuDv6sVFKVS4CCUXEhIt7BVaREtBBN+hZ+g52gWCr+DaN6jctAncuwhbtYpAN0c4BEdvLhwYOMw/88/MzxwOaBUcoxkHsx1F52igjVvcoYWjTUKeKLzHAFe4Rj3ClkXGHWEV+QLP6OGjCMEYczyiEyYtBew9TkytkGOIt12dSon4KhZqH4LC9l+C8r4El/jCL862iXiCKmpBh4094TS8p6kudUzwiR90I+wBs4BfpAj60eF8/8GycMK1bXs28YoX3Bzsi64BsPsdgC4dKKQAAAAASUVORK5CYII=);
+}
+
+.soundtrack-button-queue.sc-button-responsive {
+  text-indent: 18px;
+}
