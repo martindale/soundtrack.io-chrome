@@ -21,15 +21,6 @@ var loader = setInterval(function() {
   
   soundtrack = document.getElementById('soundtrack').contentWindow;
   
-  $.urlParam = function(name) {
-    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-    if (results == null) {
-       return null;
-    } else {
-       return results[1] || 0;
-    }
-  }
-  
 }, 250 );
 
 var sIo = {
@@ -42,7 +33,14 @@ var sIo = {
       }
     } ), '*'); // TODO: not use *?
   },
-
+  urlParam: function(name) {
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (results == null) {
+       return null;
+    } else {
+       return results[1] || 0;
+    }
+  },
   addButtons: function () {
     // add button to a single track's youtube page (doesn't seem to work from YT search)
     $('.yt-uix-menu:not(.soundtracked)').each(function(i) {
@@ -52,7 +50,7 @@ var sIo = {
       $( this ).addClass('soundtracked');
       
       var track = {
-        id: $.urlParam('v')
+        id: sIo.urlParam('v')
       }
       
       sIo.drawButton('youtube', self, track.id);
