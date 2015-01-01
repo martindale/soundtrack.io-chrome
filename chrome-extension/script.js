@@ -1,31 +1,34 @@
-var soundtrack;
-var loader = setInterval(function() {
-  if (typeof $ === "undefined") {
-    // no jquery!?=
-    return;
-  } 
-  
+// namepaced all of these functions together to keep the global scope clear
+var SIO = {
+  settings: {
+    soundCloudId: '96c2e3fbb4e99b64cc38b7a8c33a1bfe'
+  },
+  soundtrack: null,
+  init: function() {
+    var loader = setInterval(function() {
+      if (typeof $ === "undefined") {
+        return;
+      } 
 
-  clearInterval(loader);
-  setInterval(function() {
-    sIo.addButtons();
-  }, 250 );
-  
-  var iframe = document.createElement('iframe');
-  iframe.src = 'https://soundtrack.io/?iframe=true';
-  iframe.id = 'soundtrack';
-  iframe.height = 0;
-  iframe.width = 0;
+      clearInterval(loader);
+      setInterval(function() {
+        SIO.addButtons();
+      }, 250 );
+      
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://soundtrack.io/?iframe=true';
+      iframe.id = 'soundtrack';
+      iframe.height = 0;
+      iframe.width = 0;
 
-  (document.head||document.documentElement).appendChild( iframe );
-  
-  soundtrack = document.getElementById('soundtrack').contentWindow;
-  
-}, 250 );
-
-var sIo = {
+      (document.head||document.documentElement).appendChild( iframe );
+      
+      SIO.soundtrack = document.getElementById('soundtrack').contentWindow;
+      
+    }, 250 );
+  },
   queue: function( source , id ) {
-    soundtrack.postMessage( JSON.stringify({
+    SIO.soundtrack.postMessage( JSON.stringify({
       method: 'queue',
       data: {
         source: source,
@@ -50,36 +53,60 @@ var sIo = {
       $( this ).addClass('soundtracked');
       
       var track = {
-        id: sIo.urlParam('v')
+        id: SIO.urlParam('v')
       }
       
-      sIo.drawButton('youtube', self, track.id);
+      SIO.drawButton('youtube', self, track.id);
       
     });
     
     // is this a single sound's page?
-    // known issue: this fires on a playlist page as well,  need a new function for that
     $('.sc-button-share.sc-button.sc-button-medium.sc-button-responsive:not(.soundtracked)').each(function(i) {
       var self = this;
       
       // mark it as being tracked
       $( this ).addClass('soundtracked');
 
+      // if this is a playlist page, skip the button, we'll hit that with a different function
+      if ($('.listenDetails__trackList').length == 0) {
+        $.ajax({
+          url: 'https://api.soundcloud.com/resolve.json', 
+          data: { 
+            url: window.location.href, 
+            client_id: SIO.settings.soundCloudId
+          }, 
+          dataType: "jsonp",
+          success: function( track ) {
+            SIO.drawButton('soundcloud', self, track.id, 'sc-button-medium');
+          }
+        });
+      }
+    });
+    
+    // works on playlist pages
+    $('.sc-button-addtoset.sc-button.sc-button-small.sc-button-responsive:not(.soundtracked)').each(function(i) {
+      var self = this;
+
+      $( this ).addClass('soundtracked');
+
+      // find the main list item for this sound and grab the title link
+      var path = $(this).closest('.trackList__item').find('a.trackItem__trackTitle').attr('href');
+      if (!path) return;
+      console.log(path);
       $.ajax({
-        url: 'https://api.soundcloud.com/resolve.json', 
+        url:'https://api.soundcloud.com/resolve.json',
         data: { 
-          url: window.location.href, 
-          client_id: '96c2e3fbb4e99b64cc38b7a8c33a1bfe' 
-        }, 
+          url: 'https://soundcloud.com' + path, 
+          client_id: SIO.settings.soundCloudId
+        },
         dataType: "jsonp",
-        success: function( track ) {
-          sIo.drawButton('soundcloud', self, track.id, 'sc-button-medium');
+        success: function (track) {
+          SIO.drawButton('soundcloud', self, track.id, 'sc-button-small');
         }
       });
     });
-    
+
     // this works for the following SC lists: stream page(home), artist page, likes page, search page
-    // works functionally but icon needs help on profile pages
     $('.sc-button-share.sc-button.sc-button-small.sc-button-responsive:not(.soundtracked)').each(function(i) {
       var self = this;
       
@@ -94,11 +121,11 @@ var sIo = {
         url:'https://api.soundcloud.com/resolve.json',
         data: { 
           url: 'https://soundcloud.com' + path, 
-          client_id: '96c2e3fbb4e99b64cc38b7a8c33a1bfe'
+          client_id: SIO.settings.soundCloudId
         },
-        dataType: "json",
+        dataType: "jsonp",
         success: function (track) {
-          sIo.drawButton('soundcloud', self, track.id, 'sc-button-small');
+          SIO.drawButton('soundcloud', self, track.id, 'sc-button-small');
         }
       });
     });
@@ -116,13 +143,14 @@ var sIo = {
       spanWrap = true;
     }
 
-    // for SC profile views, we need som extra love on the button - skip the text and add css: text-indent: 0
     var buttonText = '&#9835; Queue &raquo;';
     var buttonStyle = '';
 
+    // add any classes passed in
     if (classes) buttonClass += ' ' + classes;
     buttonClass = 'soundtrack-button-queue ' + buttonClass;
 
+    // for SC profile views, we need som extra love on the button - add css: text-indent: 0
     if (source === 'soundcloud' && classes === 'sc-button-medium') {
       buttonStyle = 'style="text-indent: 0;"';
     }
@@ -142,7 +170,7 @@ var sIo = {
           $(this).remove();
         });
         
-        sIo.queue( source, trackId );
+        SIO.queue( source, trackId );
         
         return false;
       })
@@ -150,4 +178,7 @@ var sIo = {
       .fadeIn()
       .insertAfter( ele );
   }
-}
+};
+
+// initialize the module
+SIO.init();
