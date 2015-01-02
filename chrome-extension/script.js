@@ -15,6 +15,8 @@ var SIO = {
       // stop the outer interval now that we're loaded
       clearInterval(loader);
       
+      // add the iframe
+      SIO.buildIframe();
       // begin inner interval looking for new buttons to add
       SIO.detectInterval = setInterval(function() {
         SIO.detectPage();
@@ -39,15 +41,39 @@ var SIO = {
   detectPage: function() {
     // figure out what page we're on and send the appropriate options to addButtons
     var page = 'unknown';
-    // youtube single track page
+    
     if ($('#page.watch').length) {
+      // youtube single track page
       page = 'yt-watch';
     } else if ($('.l-two-column-sound-hero').length) {
       if ($('.isPlaylist').length) {
+        // soundcloud playlist/set page
         page = 'sc-playlist';
       } else {
+        // soundcloud single track page
         page = 'sc-track';  
       }
+    } else if ($('.stream').length) {
+      // soundcloud stream page
+      page = 'sc-stream';
+    } else if ($('.streamExplore').length) {
+      // soundcloud explore page
+      page = 'sc-explore';
+    } else if ($('.userStream').length) {
+      // soundcloud user/artist profile page
+      page = 'sc-userStream';
+    } else if ($('.collectionSection .badgeList').length) {
+      // exclude playlist list
+      if ($('.l-nav .networkTabs__sets .active').length === 0) {
+        // soundcloud collection in badge view
+        page = 'sc-badgeList';
+      }
+    } else if ($('.collectionSection .soundList').length) {
+      // soundcloud collection in badge view
+      page = 'sc-soundList';
+    } else if ($('.searchList').length) {
+      // soundcloud search page
+      page = 'sc-search';
     }
 
     SIO.addButtons(page);
@@ -94,31 +120,28 @@ var SIO = {
         });
         break;
       case 'sc-track':
-        // is this a single sound's page?
+        // works on sc single track pages
         $('.sc-button-share.sc-button.sc-button-medium.sc-button-responsive:not(.soundtracked)').each(function(i) {
           var self = this;
           
           // mark it as being tracked
           $( this ).addClass('soundtracked');
 
-          // if this is a playlist page, skip the button, we'll hit that with a different function
-          if ($('.listenDetails__trackList').length == 0) {
-            $.ajax({
-              url: 'https://api.soundcloud.com/resolve.json', 
-              data: { 
-                url: window.location.href, 
-                client_id: SIO.settings.soundCloudId
-              }, 
-              dataType: "jsonp",
-              success: function( track ) {
-                SIO.drawButton('soundcloud', self, track.id, 'sc-button-medium');
-              }
-            });
-          }
+        $.ajax({
+            url: 'https://api.soundcloud.com/resolve.json', 
+            data: { 
+              url: window.location.href, 
+              client_id: SIO.settings.soundCloudId
+            }, 
+            dataType: "jsonp",
+            success: function( track ) {
+              SIO.drawButton('soundcloud', self, track.id, 'sc-button-medium', {iconOnly: true, noIndent: true});
+            }
+          });
         });
         break;
       case 'sc-playlist':
-        // works on playlist pages
+        // works on SC playlist/set pages
         $('.sc-button-addtoset.sc-button.sc-button-small.sc-button-responsive:not(.soundtracked)').each(function(i) {
           var self = this;
 
@@ -136,11 +159,65 @@ var SIO = {
             },
             dataType: "jsonp",
             success: function( track ) {
-              SIO.drawButton('soundcloud', self, track.id, 'sc-button-small');
+              SIO.drawButton('soundcloud', self, track.id, 'sc-button-small', {iconOnly: true, noIndent: true});
             }
           });
         });
         break;
+      case 'sc-userStream':
+        // this works for the following SC lists: stream page(home), artist page
+        $('.sc-button-share.sc-button.sc-button-small.sc-button-responsive:not(.soundtracked)').each(function(i) {
+          var self = this;
+          
+          // mark it as being tracked
+          $( this ).addClass('soundtracked');
+          
+          // find the main list item for this sound and grab the title link
+          var path = $(this).closest('.soundList__item, .searchList__item').find('a.soundTitle__title').attr('href');
+          if (!path) return;
+
+          $.ajax({
+            url:'https://api.soundcloud.com/resolve.json',
+            data: { 
+              url: 'https://soundcloud.com' + path, 
+              client_id: SIO.settings.soundCloudId
+            },
+            dataType: "jsonp",
+            success: function( track ) {
+              SIO.drawButton('soundcloud', self, track.id, 'sc-button-small', {iconOnly: true, noIndent: true});
+            }
+          });
+        });
+        break;
+      case 'sc-badgeList':
+        // this works for the following SC lists: stream page(home), artist page, likes page, search page
+        $('.genericBadge:not(.soundtracked)').each(function(i) {
+          var self = this;
+          
+          // mark it as being tracked
+          $( this ).addClass('soundtracked');
+          
+          // find the main list item for this sound and grab the title link
+          var path = $(this).find('a.genericBadge__audibleHeading').attr('href');
+          if (!path) return;
+
+          var insertAfterEle = $(this).find('a.genericBadge__subHeading');
+          $.ajax({
+            url:'https://api.soundcloud.com/resolve.json',
+            data: { 
+              url: 'https://soundcloud.com' + path, 
+              client_id: SIO.settings.soundCloudId
+            },
+            dataType: "jsonp",
+            success: function( track ) {
+              SIO.drawButton('soundcloud', insertAfterEle, track.id, 'sc-button-small');
+            }
+          });
+        });
+        break;
+      case 'sc-soundList':
+      case 'sc-stream':
+      case 'sc-explore':
       default:
         // this works for the following SC lists: stream page(home), artist page, likes page, search page
         $('.sc-button-share.sc-button.sc-button-small.sc-button-responsive:not(.soundtracked)').each(function(i) {
@@ -170,9 +247,21 @@ var SIO = {
     
   },
   // based on source (soundcloud or youtube), draws inserts queue button after ele
-  drawButton: function( source, ele, trackId, classes ) {
+  drawButton: function( source, ele, trackId, classes, options ) {
     var buttonClass;
     var spanWrap = false;
+    var buttonText = '&#9835; Queue &raquo;';
+    var buttonStyle = '';
+
+    // pick up any options passed in
+    if (typeof options !== 'undefined') {
+      if (typeof options.iconOnly !== 'undefined' && options.iconOnly) {
+        buttonText = '&#9835;';
+      }
+      if (typeof options.noIndent !== 'undefined' && options.noIndent) {
+        buttonStyle = 'style="text-indent: 0;"';
+      }
+    }
 
     // depending on source we need to add a handful of classes to the button
     if (source == 'soundcloud') {
@@ -182,17 +271,10 @@ var SIO = {
       spanWrap = true;
     }
 
-    var buttonText = '&#9835; Queue &raquo;';
-    var buttonStyle = '';
 
     // add any classes passed in
     if (classes) buttonClass += ' ' + classes;
     buttonClass = 'soundtrack-button-queue ' + buttonClass;
-
-    // for SC profile views, we need som extra love on the button - add css: text-indent: 0
-    if (source === 'soundcloud' && classes === 'sc-button-medium') {
-      buttonStyle = 'style="text-indent: 0;"';
-    }
 
     var buttonHtml = '<button class="' + buttonClass + '" title="Queue on soundtrack.io" ' + buttonStyle + '>' + buttonText + '</button>';
     
