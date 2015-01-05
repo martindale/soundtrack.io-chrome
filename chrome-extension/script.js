@@ -226,7 +226,8 @@ var SIO = {
     if (path.substring(0,22) !== 'https://soundcloud.com') {
       path = 'https://soundcloud.com' + path;
     }
-    if (path.indexOf("/sets/") > -1) {
+    var pathParts = path.split('/');
+    if (typeof pathParts[4] !== 'undefined' && pathParts[4] == "sets") {
       // don't make buttons for playlists/sets
       return false;
     }
