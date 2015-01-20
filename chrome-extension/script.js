@@ -28,7 +28,7 @@ var SIO = {
   /*  creates the iframe that we use for queueing */
   buildIframe: function() {
     var iframe = document.createElement('iframe');
-    iframe.src = 'https://soundtrack.io/?iframe=true';
+    iframe.src = 'https://coding.soundtrack.io/?iframe=true';
     iframe.id = 'soundtrack';
     iframe.height = 0;
     iframe.width = 0;
