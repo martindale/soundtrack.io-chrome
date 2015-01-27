@@ -45,8 +45,8 @@ var SIO = {
     if ($('#page.watch').length) {
       // youtube single track page
       page = 'yt-watch';
-    } else if ($('.l-two-column-sound-hero').length) {
-      if ($('.isPlaylist').length) {
+    } else if ($('.fullListenHero').length) {
+      if ($('.listenDetails__trackList').length) {
         // soundcloud playlist/set page
         page = 'sc-playlist';
       } else {
@@ -80,7 +80,6 @@ var SIO = {
       // soundcloud search page
       page = 'sc-search';
     }
-
     SIO.addButtons(page);
   },
   queue: function( source , id ) {
@@ -105,7 +104,7 @@ var SIO = {
     if (typeof page === 'undefined') {
       return false;
     }
-    //console.log('adding buttons for page ' + page);
+    console.log('adding buttons for page ' + page);
     switch (page) {
       case 'yt-watch':
         // add button to a single track's youtube page (doesn't seem to work from YT search)
@@ -191,6 +190,7 @@ var SIO = {
         break;
 
       case 'sc-playlistList':
+        // items listed are all playlists, so we cannot queue them
         return false;
         break;
 
