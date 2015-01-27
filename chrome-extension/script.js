@@ -45,6 +45,8 @@ var SIO = {
     if ($('#page.watch').length) {
       // youtube single track page
       page = 'yt-watch';
+    } else if ($('.branded-page-v2-body #results').length) {
+      page = 'yt-search';
     } else if ($('.l-two-column-sound-hero').length) {
       if ($('.isPlaylist').length) {
         // soundcloud playlist/set page
@@ -119,6 +121,23 @@ var SIO = {
           }
 
           SIO.drawButton('youtube', self, track.id);
+        });
+        break;
+        
+      case 'yt-search':
+        // add button to each search result
+        $('#results .item-section > li > .yt-lockup:not(.soundtracked)').each(function(i) {
+          var self = this;
+          // mark it as being tracked
+          $( this ).addClass('soundtracked');
+
+          var track = {
+            id: $(self).data('context-item-id')
+          };
+          
+          var $badge = $(self).find('.yt-badge-list');
+
+          SIO.drawButton( 'youtube-badge' , $badge , track.id );
         });
         break;
 
@@ -270,6 +289,10 @@ var SIO = {
     } else if (source == 'youtube') {
       buttonClass += ' yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon action-panel-trigger yt-uix-button-opacity yt-uix-tooltip';
       spanWrap = true;
+    } else if (source == 'youtube-badge') {
+      source = 'youtube';
+      buttonClass += ' yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon action-panel-trigger yt-uix-button-opacity yt-uix-tooltip';
+      spanWrap = true;
     }
 
     var buttonHtml = '<button class="' + buttonClass + '" title="Queue on soundtrack.io" ' + buttonStyle + '>' + buttonText + '</button>';
@@ -299,4 +322,3 @@ var SIO = {
 
 // initialize the module
 SIO.init();
-
