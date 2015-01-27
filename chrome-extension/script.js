@@ -104,7 +104,7 @@ var SIO = {
     if (typeof page === 'undefined') {
       return false;
     }
-    console.log('adding buttons for page ' + page);
+    //console.log('adding buttons for page ' + page);
     switch (page) {
       case 'yt-watch':
         // add button to a single track's youtube page (doesn't seem to work from YT search)
