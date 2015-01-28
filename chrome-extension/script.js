@@ -47,8 +47,8 @@ var SIO = {
       page = 'yt-watch';
     } else if ($('.branded-page-v2-body #results').length) {
       page = 'yt-search';
-    } else if ($('.l-two-column-sound-hero').length) {
-      if ($('.isPlaylist').length) {
+    } else if ($('.fullListenHero').length) {
+      if ($('.listenDetails__trackList').length) {
         // soundcloud playlist/set page
         page = 'sc-playlist';
       } else {
@@ -82,7 +82,6 @@ var SIO = {
       // soundcloud search page
       page = 'sc-search';
     }
-
     SIO.addButtons(page);
   },
   queue: function( source , id ) {
@@ -210,6 +209,7 @@ var SIO = {
         break;
 
       case 'sc-playlistList':
+        // items listed are all playlists, so we cannot queue them
         return false;
         break;
 
