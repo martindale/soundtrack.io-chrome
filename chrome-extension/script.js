@@ -136,7 +136,7 @@ var SIO = {
           
           var $badge = $(self).find('.yt-badge-list');
 
-          SIO.drawButton( 'youtube-badge' , $badge , track.id );
+          SIO.drawButton( 'youtube' , $badge , track.id );
         });
         break;
 
@@ -287,10 +287,6 @@ var SIO = {
     if (source == 'soundcloud') {
       buttonClass += ' sc-button sc-button-responsive';
     } else if (source == 'youtube') {
-      buttonClass += ' yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon action-panel-trigger yt-uix-button-opacity yt-uix-tooltip';
-      spanWrap = true;
-    } else if (source == 'youtube-badge') {
-      source = 'youtube';
       buttonClass += ' yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon action-panel-trigger yt-uix-button-opacity yt-uix-tooltip';
       spanWrap = true;
     }
