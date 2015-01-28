@@ -45,6 +45,8 @@ var SIO = {
     if ($('#page.watch').length) {
       // youtube single track page
       page = 'yt-watch';
+    } else if ($('.branded-page-v2-body #results').length) {
+      page = 'yt-search';
     } else if ($('.fullListenHero').length) {
       if ($('.listenDetails__trackList').length) {
         // soundcloud playlist/set page
@@ -118,6 +120,23 @@ var SIO = {
           }
 
           SIO.drawButton('youtube', self, track.id);
+        });
+        break;
+        
+      case 'yt-search':
+        // add button to each search result
+        $('#results .item-section > li > .yt-lockup:not(.soundtracked)').each(function(i) {
+          var self = this;
+          // mark it as being tracked
+          $( this ).addClass('soundtracked');
+
+          var track = {
+            id: $(self).data('context-item-id')
+          };
+          
+          var $badge = $(self).find('.yt-badge-list');
+
+          SIO.drawButton( 'youtube' , $badge , track.id );
         });
         break;
 
@@ -299,4 +318,3 @@ var SIO = {
 
 // initialize the module
 SIO.init();
-
