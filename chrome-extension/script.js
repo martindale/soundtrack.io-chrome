@@ -1,7 +1,8 @@
 // namepaced all of these functions together to keep the global scope clear
 var SIO = {
   settings: {
-    soundCloudId: '96c2e3fbb4e99b64cc38b7a8c33a1bfe'
+    soundCloudId: '96c2e3fbb4e99b64cc38b7a8c33a1bfe',
+    soundCloudConfirmLength: 720000 /* in milliseconds. default: 720000 (12 min.) */
   },
   soundtrack: null,
   detectInterval: null,
@@ -122,7 +123,7 @@ var SIO = {
           SIO.drawButton('youtube', self, track.id);
         });
         break;
-        
+
       case 'yt-search':
         // add button to each search result
         $('#results .item-section > li > .yt-lockup:not(.soundtracked)').each(function(i) {
@@ -133,7 +134,7 @@ var SIO = {
           var track = {
             id: $(self).data('context-item-id')
           };
-          
+
           var $badge = $(self).find('.yt-badge-list');
 
           SIO.drawButton( 'youtube' , $badge , track.id );
@@ -258,6 +259,7 @@ var SIO = {
       },
       dataType: "jsonp",
       success: function( track ) {
+        options.duration = track.duration;
         SIO.drawButton('soundcloud', ele, track.id, options);
       }
     });
@@ -301,6 +303,12 @@ var SIO = {
     $(buttonHtml)
       .on('click', function( event ) {
         event.preventDefault();
+        // if track is greater than 10 minutes, require confirmation
+        if (typeof options.duration !== 'undefined' && options.duration > SIO.settings.soundCloudConfirmLength) {
+          if (!confirm("Are you sure you want to queue this track?  It's kinda long. ¯\\_(ツ)_/¯")) {
+            return false;
+          }
+        }
 
         $(this).slideUp(function() {
           $(this).remove();
