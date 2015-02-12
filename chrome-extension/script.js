@@ -259,6 +259,7 @@ var SIO = {
       },
       dataType: "jsonp",
       success: function( track ) {
+        options.title = track.title;
         options.duration = track.duration;
         SIO.drawButton('soundcloud', ele, track.id, options);
       }
@@ -306,6 +307,13 @@ var SIO = {
         // if track is greater than 10 minutes, require confirmation
         if (typeof options.duration !== 'undefined' && options.duration > SIO.settings.soundCloudConfirmLength) {
           if (!confirm("Are you sure you want to queue this track?  It's kinda long. ¯\\_(ツ)_/¯")) {
+            return false;
+          }
+        }
+
+        // if track title contains 'preview', require confirmation
+        if (typeof options.title !== 'undefined' && options.title.toLowerCase().indexOf("preview") > -1) {
+          if (!confirm("This track looks like it might be a preview. Are you sure you wish to queue it?")) {
             return false;
           }
         }
