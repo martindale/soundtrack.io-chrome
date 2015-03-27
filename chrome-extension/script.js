@@ -120,7 +120,9 @@ var SIO = {
             id: SIO.urlParam('v')
           }
 
-          SIO.drawButton('youtube', self, track.id);
+          var buttonOptions = SIO.getYouTubeOptions(self, page);
+
+          SIO.drawButton('youtube', self, track.id, buttonOptions);
         });
         break;
 
@@ -137,7 +139,9 @@ var SIO = {
 
           var $badge = $(self).find('.yt-badge-list');
 
-          SIO.drawButton( 'youtube' , $badge , track.id );
+          var buttonOptions = SIO.getYouTubeOptions(self, page);
+
+          SIO.drawButton( 'youtube' , $badge , track.id , buttonOptions);
         });
         break;
 
@@ -236,7 +240,62 @@ var SIO = {
         break;
     }
   },
-  // resolves the path using the soundcloud API and draws button on success
+  getYouTubeOptions: function(ele, page) {
+    var trackTime = '', trackTitle = ''. timeInMs = 0;
+
+    if (page == 'yt-search') {
+      // grab the tracktime (stored in hh:mm:ss on youtube)
+      trackTime = $(ele).find('.video-time').text();
+      var timeInMs = SIO.hmsToMilliseconds(trackTime);
+      // grab the track title so we can block preview tracks
+      trackTitle = $(ele).find('.yt-uix-tile-link').prop('title');
+    } else if (page == 'yt-watch') {
+      trackTitle = $('.watch-title').prop('title');
+      trackTime = $('.watch-main-col meta[itemprop="duration"]').prop('content');
+      var timeInMs = SIO.ytTimeToMilliseconds(trackTime);
+    }
+
+    var options = {
+      duration : timeInMs,
+      title: trackTitle
+    };
+    return options;
+  },
+  ytTimeToMilliseconds: function(trackTime) {
+    // duration on the watch pages is in a weird format:
+    // "PT<number of minutes>S<number of seconds"
+    // eg   4:20   =  PT4M20S
+    // eg  10:11:12 = PT611M12S
+    // strip off last character "S"
+    // strip off first two characters "PT"
+    // split on "M"
+    // item [0] will be minutes
+    // item [1] will be seconds
+    var stripped = trackTime.substr(0,trackTime.length-1).substr(2);
+    var split = stripped.split('M');
+    var minutes = parseInt(split[0],10);
+    var seconds = parseInt(split[1],10);
+
+    var milliseconds = ((minutes * 60) + seconds) * 1000;
+    return milliseconds;
+  },
+  /**
+   * converts time given in HH:MM:SS  or MM:SS or SS  format to milliseconds
+   */
+  hmsToMilliseconds: function(hms) {
+    var p = hms.split(':'),
+        s = 0, m = 1;
+
+    while (p.length > 0) {
+        s += m * parseInt(p.pop(), 10);
+        m *= 60;
+    }
+
+    return (s * 1000);
+  },
+  /**
+   * resolves the path using the soundcloud API and draws button on success
+   */
   resolvePath: function ( path, ele, options ) {
     // make sure we have what we need
     if (typeof path === 'unidentified' || typeof ele == 'unidentified') {
