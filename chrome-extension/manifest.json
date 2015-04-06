@@ -24,7 +24,8 @@
           "http://soundcloud.com/*",
           "https://*.youtube.com/*",
           "http://*.youtube.com/*"
-        ]
+        ],
+        "run_at": "document_start"
     }],
     "web_accessible_resources": ["script.js", "inject.js", "jquery-2.1.1.min.js", "style.css"]
 }
