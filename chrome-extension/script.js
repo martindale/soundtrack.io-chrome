@@ -279,7 +279,7 @@ var SIO = {
 
     var options = {
       duration : timeInMs,
-      title: trackTitle
+      title: trackTitle || ''
     };
     return options;
   },
