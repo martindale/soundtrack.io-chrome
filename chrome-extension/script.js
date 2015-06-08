@@ -107,7 +107,7 @@ var SIO = {
     if (typeof page === 'undefined') {
       return false;
     }
-    //console.log('adding buttons for page ' + page);
+    // console.log('adding buttons for page ' + page);
     switch (page) {
       case 'yt-watch':
         // add button to a single track's youtube page (doesn't seem to work from YT search)
@@ -305,24 +305,27 @@ var SIO = {
     if (path.substring(0,22) !== 'https://soundcloud.com') {
       path = 'https://soundcloud.com' + path;
     }
+
     var pathParts = path.split('/');
+
     if (typeof pathParts[4] !== 'undefined' && pathParts[4] == "sets") {
       // don't make buttons for playlists/sets
       return false;
     }
+
     $.ajax({
       url:'https://api.soundcloud.com/resolve.json',
       data: {
         url: path,
         client_id: SIO.settings.soundCloudId
       },
-      dataType: "jsonp",
       success: function( track ) {
         options.title = track.title;
         options.duration = track.duration;
         SIO.drawButton('soundcloud', ele, track.id, options);
       }
     });
+
   },
   // based on source (soundcloud or youtube), draws inserts queue button after ele
   drawButton: function( source, ele, trackId, options ) {
