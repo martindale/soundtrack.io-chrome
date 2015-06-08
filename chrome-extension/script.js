@@ -168,7 +168,7 @@ var SIO = {
           $( this ).addClass('soundtracked');
 
           // find the main list item for this sound and grab the title link
-          var path = $(this).closest('.trackList__item').find('a.trackItem__trackTitle').attr('href');
+          var path = $(this).closest('.trackList__item, .trackListWithEdit__item').find('a.trackItem__trackTitle, a.trackItemWithEdit__trackTitle').attr('href');
           if (!path) return;
 
           var buttonOptions = {classes: 'sc-button-small', iconOnly: true, noIndent: true};
