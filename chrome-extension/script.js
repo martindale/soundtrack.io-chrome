@@ -48,6 +48,9 @@ var SIO = {
       page = 'yt-watch';
     } else if ($('.branded-page-v2-body #results').length) {
       page = 'yt-search';
+    } else if ($('.more-menu-wrapper').length) {
+      // youtube playlist page (?)
+      page = 'yt-playlist';
     } else if ($('.fullListenHero').length) {
       if ($('.listenDetails__trackList').length) {
         // soundcloud playlist/set page
@@ -138,6 +141,25 @@ var SIO = {
           };
 
           var $badge = $(self).find('.yt-badge-list');
+
+          var buttonOptions = SIO.getYouTubeOptions(self, page);
+
+          SIO.drawButton( 'youtube' , $badge , track.id , buttonOptions);
+        });
+        break;
+        
+      case 'yt-playlist':
+        // add button to each search result
+        $('.pl-video:not(.soundtracked)').each(function(i) {
+          var self = this;
+          // mark it as being tracked
+          $( this ).addClass('soundtracked');
+
+          var track = {
+            id: $(self).data('video-id')
+          };
+
+          var $badge = $(self).find('.pl-video-edit-options > *')[0];
 
           var buttonOptions = SIO.getYouTubeOptions(self, page);
 
@@ -257,7 +279,7 @@ var SIO = {
 
     var options = {
       duration : timeInMs,
-      title: trackTitle
+      title: trackTitle || ''
     };
     return options;
   },
