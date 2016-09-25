@@ -114,7 +114,7 @@ var SIO = {
     switch (page) {
       case 'yt-watch':
         // add button to a single track's youtube page (doesn't seem to work from YT search)
-        $('.yt-uix-menu:last:not(.soundtracked)').each(function(i) {
+        $('.watch-secondary-actions:not(.soundtracked)').each(function(i) {
           var self = this;
           // mark it as being tracked
           $( this ).addClass('soundtracked');
@@ -122,10 +122,12 @@ var SIO = {
           var track = {
             id: SIO.urlParam('v')
           }
+          
+          var $share = $(self).find('.action-panel-trigger-share:nth-last-child(2)');
 
           var buttonOptions = SIO.getYouTubeOptions(self, page);
 
-          SIO.drawButton('youtube', self, track.id, buttonOptions);
+          SIO.drawButton('youtube', $share, track.id, buttonOptions);
         });
         break;
 
