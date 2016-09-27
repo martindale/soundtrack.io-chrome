@@ -23,7 +23,9 @@
           "https://soundcloud.com/*",
           "http://soundcloud.com/*",
           "https://*.youtube.com/*",
-          "http://*.youtube.com/*"
+          "http://*.youtube.com/*",
+          "https://*.bandcamp.com/*",
+          "http://*.bandcamp.com/*"
         ],
         "run_at": "document_start",
         "all_frames": true
