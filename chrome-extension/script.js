@@ -85,6 +85,8 @@ var SIO = {
     } else if ($('.searchList').length) {
       // soundcloud search page
       page = 'sc-search';
+    } else if ($('table.track_table').length) {
+      page = 'bandcamp-album';
     }
     SIO.addButtons(page);
   },
@@ -244,7 +246,7 @@ var SIO = {
       case 'sc-stream':
       case 'sc-explore':
       case 'sc-Artist':
-      default:
+      //-default:
         // this works for the following SC lists: stream page(home), collection page list views, explore pages
         $('.sc-button-share.sc-button.sc-button-small.sc-button-responsive:not(.soundtracked)').each(function(i) {
           var self = this;
@@ -259,6 +261,44 @@ var SIO = {
 
           SIO.resolvePath(path, self, buttonOptions);
         });
+        break;
+      
+      case 'bandcamp-album':
+        $('.track_table .play-col:not(.soundtracked)').each(function (i) {
+          var self = this;
+          // mark it as being tracked
+          $( this ).addClass('soundtracked');
+  
+          var trackData = $.extend({}, TralbumData, TralbumData.trackinfo[i || 0]);
+          var track = {
+            artist: TralbumData.artist,
+            title: trackData.title,
+            id: trackData.id,
+            url: trackData.file['mp3-128'],
+            duration: trackData.duration,
+            thumbnail: TralbumData.artThumbURL,
+            artwork_url: TralbumData.artFullsizeUrl
+          }
+          
+          $('<td class="queue-col" style="padding: 4px 3px;"></td>')
+            .append($('<span data-track-id="'+track.id+'"></span>'))
+            .insertAfter($(self));
+
+          var buttonOptions = {
+            classes: 'bandcamp-queue-button',
+            style: 'font-size: 10px; width: 60px;'
+          };
+          
+          var $cell = $('.queue-col span[data-track-id='+track.id+']');
+          
+          console.log('cell:', $cell);
+          
+          SIO.drawButton('bandcamp', $cell, track, buttonOptions);
+        });
+        break;
+      
+      default:
+        console.log('Unhandled page:', page);
         break;
     }
   },
@@ -363,10 +403,13 @@ var SIO = {
         buttonText = '&#9835;';
       }
       if (typeof options.noIndent !== 'undefined' && options.noIndent) {
-        buttonStyle = 'style="text-indent: 0;"';
+        buttonStyle += 'text-indent: 0;';
       }
       if (typeof options.classes !== 'undefined' && options.classes) {
         buttonClass += ' ' + options.classes;
+      }
+      if (typeof options.style !== 'undefined' && options.style) {
+        buttonStyle += options.style;
       }
     }
 
@@ -376,9 +419,11 @@ var SIO = {
     } else if (source == 'youtube') {
       buttonClass += ' yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon action-panel-trigger yt-uix-button-opacity yt-uix-tooltip';
       spanWrap = true;
+    } else if (source == 'bandcamp') {
+      buttonClass += '';
     }
 
-    var buttonHtml = '<button class="' + buttonClass + '" title="Queue on soundtrack.io" ' + buttonStyle + '>' + buttonText + '</button>';
+    var buttonHtml = '<button class="' + buttonClass + '" title="Queue on soundtrack.io" style="' + buttonStyle + '">' + buttonText + '</button>';
 
     // spanwrap is required for some sites (youtube)
     if (spanWrap) {
