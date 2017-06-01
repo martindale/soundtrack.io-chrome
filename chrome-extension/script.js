@@ -65,7 +65,7 @@ var SIO = {
     } else if ($('.streamExplore').length) {
       // soundcloud explore page
       page = 'sc-explore';
-    } else if ($('.l-fixed-fluid .userStream').length) {
+    } else if ($('.l-user-hero').length) {
       // soundcloud premium artists (2 column layout)
       page = 'sc-Artist';
     } else if ($('.l-three-column .userStream').length) {
@@ -88,6 +88,9 @@ var SIO = {
     } else if ($('table.track_table').length) {
       page = 'bandcamp-album';
     }
+    
+    console.log('[SOUNDTRACK:EXTENSION]', 'page loaded.  drawing buttons for:', page);
+    
     SIO.addButtons(page);
   },
   queue: function( source , id ) {
@@ -180,7 +183,10 @@ var SIO = {
 
           var path = window.location.href;
 
-          var buttonOptions = { classes: 'sc-button-medium', iconOnly: true, noIndent: true };
+          var buttonOptions = {
+            classes: 'sc-button-medium',
+            noIndent: true
+          };
           SIO.resolvePath(path, self, buttonOptions);
 
         });
